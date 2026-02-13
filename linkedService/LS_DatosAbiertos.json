@@ -4,7 +4,7 @@
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
-			"url": "https://www.datos.gov.co/resource/",
+			"url": "https://www.datos.gov.co/api/v3/views/rpmr-utcd/",
 			"enableServerCertificateValidation": true,
 			"authenticationType": "Anonymous"
 		}
