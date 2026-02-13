@@ -5,19 +5,6 @@
 			"referenceName": "LS_DatosAbiertos",
 			"type": "LinkedServiceReference"
 		},
-		"parameters": {
-			"where": {
-				"type": "string"
-			},
-			"limit": {
-				"type": "string",
-				"defaultValue": "45000"
-			},
-			"offset": {
-				"type": "string",
-				"defaultValue": "0"
-			}
-		},
 		"annotations": [],
 		"type": "RestResource",
 		"typeProperties": {
