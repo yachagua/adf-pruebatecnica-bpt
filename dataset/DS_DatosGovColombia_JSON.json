@@ -5,10 +5,30 @@
 			"referenceName": "LS_DatosAbiertos",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"where": {
+				"type": "string",
+				"defaultValue": "Meta"
+			},
+			"limit": {
+				"type": "string",
+				"defaultValue": "45000"
+			},
+			"offset": {
+				"type": "string",
+				"defaultValue": "0"
+			}
+		},
 		"annotations": [],
 		"type": "RestResource",
 		"typeProperties": {
-			"relativeUrl": "/resource/rpmr-utcd.json"
+			"relativeUrl": "/resource/rpmr-utcd.json",
+			"queryParameters": {
+				"$where": "@dataset().where",
+				"$limit": "@dataset().limit",
+				"$offset": "@dataset().offset",
+				"$$app_token": "So04mDufgciNKByJTX1q6krW4"
+			}
 		},
 		"schema": []
 	}
