@@ -5,14 +5,6 @@
 			"referenceName": "LS_Datalake",
 			"type": "LinkedServiceReference"
 		},
-		"parameters": {
-			"path": {
-				"type": "string"
-			},
-			"file": {
-				"type": "string"
-			}
-		},
 		"annotations": [],
 		"type": "Json",
 		"typeProperties": {
