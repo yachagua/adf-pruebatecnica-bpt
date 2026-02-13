@@ -1,0 +1,37 @@
+{
+	"name": "DelimitedText1",
+	"properties": {
+		"description": "https://www.datos.gov.co",
+		"linkedServiceName": {
+			"referenceName": "HttpServer1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"p_offset": {
+				"type": "int",
+				"defaultValue": 0
+			},
+			"p_departamento": {
+				"type": "string",
+				"defaultValue": "Meta"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "@concat(\n'resource/p6dx-8zbt.csv?$where=departamento_entidad=''',\ndataset().p_departamento,\n'''&$limit=50000&$offset=',\nstring(dataset().p_offset)\n)",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": ",",
+			"rowDelimiter": "\n",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
