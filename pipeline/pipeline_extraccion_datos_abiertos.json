@@ -46,8 +46,14 @@
 						"referenceName": "DS_BlobStorage_DatosGov",
 						"type": "DatasetReference",
 						"parameters": {
-							"path": "bronce",
-							"file": "contratos.json"
+							"path": {
+								"value": "bronce",
+								"type": "Expression"
+							},
+							"file": {
+								"value": "@concat('contratos_', formatDateTime(utcNow(),'yyyyMMdd_HHmmss'), '.json')",
+								"type": "Expression"
+							}
 						}
 					}
 				]
