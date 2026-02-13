@@ -38,7 +38,12 @@
 				"inputs": [
 					{
 						"referenceName": "DS_DatosGovColombia_JSON",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"where": "departamento_entidad = 'Meta'",
+							"limit": "45000",
+							"offset": "0"
+						}
 					}
 				],
 				"outputs": [
