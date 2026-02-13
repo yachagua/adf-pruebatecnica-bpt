@@ -19,7 +19,7 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"fileName": {
-					"value": "@dataset().file",
+					"value": "@concat('contratos_', formatDateTime(utcNow(),'yyyyMMdd_HHmmss'), '.json')",
 					"type": "Expression"
 				},
 				"fileSystem": {
