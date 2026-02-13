@@ -1,0 +1,15 @@
+{
+	"name": "DS_DatosGovColombia_JSON",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_DatosAbiertos",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": "/resource/rpmr-utcd.json"
+		},
+		"schema": []
+	}
+}
