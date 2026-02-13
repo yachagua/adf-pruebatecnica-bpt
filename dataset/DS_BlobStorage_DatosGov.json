@@ -1,0 +1,33 @@
+{
+	"name": "DS_BlobStorage_DatosGov",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Datalake",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"path": {
+				"type": "string"
+			},
+			"file": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().file",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().path",
+					"type": "Expression"
+				}
+			}
+		},
+		"schema": {}
+	}
+}
