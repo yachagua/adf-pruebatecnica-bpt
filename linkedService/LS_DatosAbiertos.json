@@ -1,0 +1,12 @@
+{
+	"name": "LS_DatosAbiertos",
+	"properties": {
+		"annotations": [],
+		"type": "HttpServer",
+		"typeProperties": {
+			"url": "https://www.datos.gov.co/api/odata/v4/p6dx-8zbt",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	}
+}
