@@ -18,14 +18,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": {
-					"value": "@dataset().file",
-					"type": "Expression"
-				},
-				"fileSystem": {
-					"value": "@dataset().path",
-					"type": "Expression"
-				}
+				"fileName": "contratos.json",
+				"fileSystem": "bronce"
 			}
 		},
 		"schema": {}
