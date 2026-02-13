@@ -1,0 +1,9 @@
+{
+	"name": "adf-prueba-bpt",
+	"location": "eastus2",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "d046063a-049f-493c-a312-0b1ad6ad6a40",
+		"tenantId": "802ad7cd-5856-414e-b103-2222ccaa64be"
+	}
+}
