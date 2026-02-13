@@ -20,6 +20,10 @@
 						"httpRequestTimeout": "00:01:40",
 						"requestInterval": "00.00:00:00.010",
 						"requestMethod": "GET",
+						"additionalHeaders": {
+							"User-Agent": "Mozilla/5.0",
+							"token": "So04mDufgciNKByJTX1q6krW4"
+						},
 						"paginationRules": {
 							"supportRFC5988": "true"
 						}
