@@ -48,11 +48,7 @@
 				"outputs": [
 					{
 						"referenceName": "DS_BlobStorage_DatosGov",
-						"type": "DatasetReference",
-						"parameters": {
-							"path": "bronce",
-							"file": "hola.json"
-						}
+						"type": "DatasetReference"
 					}
 				]
 			}
