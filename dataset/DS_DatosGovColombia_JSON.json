@@ -7,8 +7,7 @@
 		},
 		"parameters": {
 			"where": {
-				"type": "string",
-				"defaultValue": "Meta"
+				"type": "string"
 			},
 			"limit": {
 				"type": "string",
