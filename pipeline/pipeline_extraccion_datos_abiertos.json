@@ -17,6 +17,15 @@
 				"typeProperties": {
 					"source": {
 						"type": "DelimitedTextSource",
+						"additionalColumns": [
+							{
+								"name": "fecha_carga",
+								"value": {
+									"value": "@addHours(utcNow(), -5)",
+									"type": "Expression"
+								}
+							}
+						],
 						"storeSettings": {
 							"type": "HttpReadSettings",
 							"requestMethod": "GET"
