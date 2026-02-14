@@ -3,7 +3,7 @@
 	"properties": {
 		"description": "https://www.datos.gov.co",
 		"linkedServiceName": {
-			"referenceName": "HttpServer1",
+			"referenceName": "LS_DatosAbiertos",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
