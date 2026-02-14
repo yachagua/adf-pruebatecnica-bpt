@@ -5,7 +5,14 @@
 			{
 				"name": "Copia_Datos_Api_Storage",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "ConsultarSecreto",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -116,12 +123,37 @@
 						"zona_storage": {
 							"value": "@pipeline().parameters.zona_storage",
 							"type": "Expression"
+						},
+						"storage_key": {
+							"value": "@activity('ConsultarSecreto').output.value",
+							"type": "Expression"
 						}
 					}
 				},
 				"linkedServiceName": {
 					"referenceName": "ls_databricks_prueba",
 					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "ConsultarSecreto",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": "https://kv-databricks-bpt.vault.azure.net/secrets/key-blob?api-version=7.0",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
 				}
 			}
 		],
