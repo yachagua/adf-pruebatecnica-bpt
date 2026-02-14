@@ -61,7 +61,14 @@
 				"outputs": [
 					{
 						"referenceName": "DS_BlobStorage_DatosGov",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"ruta": "bronce",
+							"nombre_archivo": {
+								"value": "@pipeline().parameters.departamento",
+								"type": "Expression"
+							}
+						}
 					}
 				]
 			}
