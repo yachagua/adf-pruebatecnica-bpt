@@ -1,0 +1,10 @@
+{
+	"name": "KV_Accesos",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://kv-databricks-bpt.vault.azure.net/"
+		}
+	}
+}
