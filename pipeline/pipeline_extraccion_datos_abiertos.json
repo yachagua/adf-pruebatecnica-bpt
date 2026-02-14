@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "CopiaDatos_Datalake",
+				"name": "Copy data1",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -16,16 +16,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "RestSource",
-						"httpRequestTimeout": "00:01:40",
-						"requestInterval": "00.00:00:00.010",
-						"requestMethod": "GET",
-						"additionalHeaders": {
-							"User-Agent": "Mozilla/5.0",
-							"token": "So04mDufgciNKByJTX1q6krW4"
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
 						},
-						"paginationRules": {
-							"supportRFC5988": "true"
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
 						}
 					},
 					"sink": {
@@ -41,8 +38,11 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "DS_DatosGovColombia_JSON",
-						"type": "DatasetReference"
+						"referenceName": "DelimitedText1",
+						"type": "DatasetReference",
+						"parameters": {
+							"p_departamento": "Chocó"
+						}
 					}
 				],
 				"outputs": [

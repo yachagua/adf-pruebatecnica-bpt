@@ -7,10 +7,6 @@
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"p_offset": {
-				"type": "int",
-				"defaultValue": 0
-			},
 			"p_departamento": {
 				"type": "string",
 				"defaultValue": "Meta"
@@ -22,7 +18,7 @@
 			"location": {
 				"type": "HttpServerLocation",
 				"relativeUrl": {
-					"value": "@concat(\n'resource/p6dx-8zbt.csv?$where=departamento_entidad=''',\ndataset().p_departamento,\n'''&$limit=50000&$offset=',\nstring(dataset().p_offset)\n)",
+					"value": "@concat(\n'resource/p6dx-8zbt.csv?$where=departamento_entidad=''',\ndataset().p_departamento,\n'''&$limit=50000&$offset=0'\n)",
 					"type": "Expression"
 				}
 			},
