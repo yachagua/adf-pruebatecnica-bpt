@@ -1,0 +1,37 @@
+{
+	"name": "DS_BlobStorage_DatosGov",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Datalake",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"ruta": {
+				"type": "string"
+			},
+			"nombre_archivo": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@concat(dataset().nombre_archivo,'.csv')",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().ruta",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}

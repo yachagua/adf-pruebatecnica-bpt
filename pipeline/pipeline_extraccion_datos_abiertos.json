@@ -26,22 +26,35 @@
 						}
 					},
 					"sink": {
-						"type": "JsonSink",
+						"type": "DelimitedTextSink",
 						"storeSettings": {
 							"type": "AzureBlobFSWriteSettings"
 						},
 						"formatSettings": {
-							"type": "JsonWriteSettings"
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
 						}
 					},
-					"enableStaging": false
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
 				},
 				"inputs": [
 					{
 						"referenceName": "DS_DatosGovColombia_CSV",
 						"type": "DatasetReference",
 						"parameters": {
-							"p_departamento": "Chocó"
+							"p_departamento": {
+								"value": "@pipeline().parameters.departamento",
+								"type": "Expression"
+							}
 						}
 					}
 				],
@@ -53,6 +66,12 @@
 				]
 			}
 		],
+		"parameters": {
+			"departamento": {
+				"type": "string",
+				"defaultValue": "Chocó"
+			}
+		},
 		"annotations": []
 	}
 }
