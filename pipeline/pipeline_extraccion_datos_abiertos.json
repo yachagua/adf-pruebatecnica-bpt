@@ -246,14 +246,6 @@
 			"ruta_notebook_databricks": {
 				"type": "string",
 				"defaultValue": "/Users/yao.men92@hotmail.com/databricks-prueba-bpt/procesamiento_datos_silver_contratos"
-			},
-			"zona_bronce_storage": {
-				"type": "string",
-				"defaultValue": "bronce"
-			},
-			"zona_silver_storage": {
-				"type": "string",
-				"defaultValue": "silver"
 			}
 		},
 		"annotations": []
