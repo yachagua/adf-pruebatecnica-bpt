@@ -125,7 +125,7 @@
 							"type": "Expression"
 						},
 						"zona_storage": {
-							"value": "@pipeline().parameters.zona_storage",
+							"value": "@pipeline().parameters.zona_silver_storage",
 							"type": "Expression"
 						},
 						"storage_key": {
@@ -261,11 +261,11 @@
 			},
 			"zona_bronce_storage": {
 				"type": "string",
-				"defaultValue": "bronce"
+				"defaultValue": "bronce/contratos"
 			},
 			"zona_silver_storage": {
 				"type": "string",
-				"defaultValue": "silver"
+				"defaultValue": "silver/contratos"
 			}
 		},
 		"annotations": []
