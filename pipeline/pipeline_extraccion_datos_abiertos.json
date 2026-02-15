@@ -213,7 +213,7 @@
 						"referenceName": "DS_BlobStorage_DatosGov",
 						"type": "DatasetReference",
 						"parameters": {
-							"zona": "silver",
+							"zona": "bronce",
 							"nombre_archivo": {
 								"value": "@pipeline().parameters.departamento",
 								"type": "Expression"
