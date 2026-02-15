@@ -125,7 +125,7 @@
 							"value": "@pipeline().parameters.departamento",
 							"type": "Expression"
 						},
-						"zona_storage": "silver/contratos",
+						"zona_storage": "silver",
 						"storage_key": {
 							"value": "@activity('ConsultarSecreto').output.value",
 							"type": "Expression"
