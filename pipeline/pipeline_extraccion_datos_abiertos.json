@@ -84,7 +84,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"zona": {
-								"value": "@pipeline().parameters.zona_bronce_storage",
+								"value": "bronce",
 								"type": "Expression"
 							},
 							"nombre_archivo": {
@@ -125,7 +125,7 @@
 							"value": "@pipeline().parameters.departamento",
 							"type": "Expression"
 						},
-						"zona_storage": "silver",
+						"zona_storage": "silver/contratos",
 						"storage_key": {
 							"value": "@activity('ConsultarSecreto').output.value",
 							"type": "Expression"
