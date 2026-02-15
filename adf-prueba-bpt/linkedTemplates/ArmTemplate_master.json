@@ -7,6 +7,34 @@
 			"metadata": "Nombre de instancia de Data Factory",
 			"defaultValue": "adf-prueba-bpt"
 		},
+		"LS_Datalake_accountKey": {
+			"type": "secureString",
+			"metadata": "Cadena protegida para \"accountKey\"de \"LS_Datalake\""
+		},
+		"ls_databricks_prueba_accessToken": {
+			"type": "secureString",
+			"metadata": "Cadena protegida para \"accessToken\"de \"ls_databricks_prueba\""
+		},
+		"LS_Datalake_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://stgpruebabpt.dfs.core.windows.net/"
+		},
+		"LS_DatosAbiertos_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://www.datos.gov.co"
+		},
+		"ls_databricks_prueba_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "0214-125935-f25m9kog"
+		},
+		"trigger_pipeline_contratos_properties_pipeline_extraccion_datos_abiertos_parameters_departamento": {
+			"type": "string",
+			"defaultValue": "Chocó"
+		},
+		"trigger_pipeline_contratos_properties_pipeline_extraccion_datos_abiertos_parameters_ruta_notebook_databricks": {
+			"type": "string",
+			"defaultValue": "/Users/yao.men92@hotmail.com/databricks-prueba-bpt/procesamiento_datos_silver_contratos"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI de la cuenta de almacenamiento que contiene las plantillas de ARM vinculadas."
@@ -33,6 +61,27 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"LS_Datalake_accountKey": {
+						"value": "[parameters('LS_Datalake_accountKey')]"
+					},
+					"ls_databricks_prueba_accessToken": {
+						"value": "[parameters('ls_databricks_prueba_accessToken')]"
+					},
+					"LS_Datalake_properties_typeProperties_url": {
+						"value": "[parameters('LS_Datalake_properties_typeProperties_url')]"
+					},
+					"LS_DatosAbiertos_properties_typeProperties_url": {
+						"value": "[parameters('LS_DatosAbiertos_properties_typeProperties_url')]"
+					},
+					"ls_databricks_prueba_properties_typeProperties_existingClusterId": {
+						"value": "[parameters('ls_databricks_prueba_properties_typeProperties_existingClusterId')]"
+					},
+					"trigger_pipeline_contratos_properties_pipeline_extraccion_datos_abiertos_parameters_departamento": {
+						"value": "[parameters('trigger_pipeline_contratos_properties_pipeline_extraccion_datos_abiertos_parameters_departamento')]"
+					},
+					"trigger_pipeline_contratos_properties_pipeline_extraccion_datos_abiertos_parameters_ruta_notebook_databricks": {
+						"value": "[parameters('trigger_pipeline_contratos_properties_pipeline_extraccion_datos_abiertos_parameters_ruta_notebook_databricks')]"
 					}
 				}
 			},

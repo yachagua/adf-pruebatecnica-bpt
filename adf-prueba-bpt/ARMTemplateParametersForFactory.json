@@ -4,6 +4,27 @@
 	"parameters": {
 		"factoryName": {
 			"value": "adf-prueba-bpt"
+		},
+		"LS_Datalake_accountKey": {
+			"value": ""
+		},
+		"ls_databricks_prueba_accessToken": {
+			"value": ""
+		},
+		"LS_Datalake_properties_typeProperties_url": {
+			"value": "https://stgpruebabpt.dfs.core.windows.net/"
+		},
+		"LS_DatosAbiertos_properties_typeProperties_url": {
+			"value": "https://www.datos.gov.co"
+		},
+		"ls_databricks_prueba_properties_typeProperties_existingClusterId": {
+			"value": "0214-125935-f25m9kog"
+		},
+		"trigger_pipeline_contratos_properties_pipeline_extraccion_datos_abiertos_parameters_departamento": {
+			"value": "Chocó"
+		},
+		"trigger_pipeline_contratos_properties_pipeline_extraccion_datos_abiertos_parameters_ruta_notebook_databricks": {
+			"value": "/Users/yao.men92@hotmail.com/databricks-prueba-bpt/procesamiento_datos_silver_contratos"
 		}
 	}
 }

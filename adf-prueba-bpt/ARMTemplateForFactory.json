@@ -6,6 +6,34 @@
 			"type": "string",
 			"metadata": "Nombre de instancia de Data Factory",
 			"defaultValue": "adf-prueba-bpt"
+		},
+		"LS_Datalake_accountKey": {
+			"type": "secureString",
+			"metadata": "Cadena protegida para \"accountKey\"de \"LS_Datalake\""
+		},
+		"ls_databricks_prueba_accessToken": {
+			"type": "secureString",
+			"metadata": "Cadena protegida para \"accessToken\"de \"ls_databricks_prueba\""
+		},
+		"LS_Datalake_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://stgpruebabpt.dfs.core.windows.net/"
+		},
+		"LS_DatosAbiertos_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://www.datos.gov.co"
+		},
+		"ls_databricks_prueba_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "0214-125935-f25m9kog"
+		},
+		"trigger_pipeline_contratos_properties_pipeline_extraccion_datos_abiertos_parameters_departamento": {
+			"type": "string",
+			"defaultValue": "Chocó"
+		},
+		"trigger_pipeline_contratos_properties_pipeline_extraccion_datos_abiertos_parameters_ruta_notebook_databricks": {
+			"type": "string",
+			"defaultValue": "/Users/yao.men92@hotmail.com/databricks-prueba-bpt/procesamiento_datos_silver_contratos"
 		}
 	},
 	"variables": {
@@ -13,27 +41,529 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/pipeline_test')]",
+			"name": "[concat(parameters('factoryName'), '/pipeline_extraccion_datos_abiertos')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "Wait1",
-						"type": "Wait",
-						"dependsOn": [],
+						"name": "Copia_Datos_Api_Bronce",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "ConsultarSecretoBlob",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
 						"userProperties": [],
 						"typeProperties": {
-							"waitTimeInSeconds": 5
+							"source": {
+								"type": "DelimitedTextSource",
+								"additionalColumns": [
+									{
+										"name": "fecha_carga",
+										"value": {
+											"value": "@addHours(utcNow(), -5)",
+											"type": "Expression"
+										}
+									},
+									{
+										"name": "origen_datos",
+										"value": "https://www.datos.gov.co"
+									}
+								],
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_DatosGovColombia_CSV",
+								"type": "DatasetReference",
+								"parameters": {
+									"p_departamento": {
+										"value": "@pipeline().parameters.departamento",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_BlobStorage_DatosGov",
+								"type": "DatasetReference",
+								"parameters": {
+									"zona": {
+										"value": "bronce",
+										"type": "Expression"
+									},
+									"nombre_archivo": {
+										"value": "@pipeline().parameters.departamento",
+										"type": "Expression"
+									},
+									"contenedor": "contratos"
+								}
+							}
+						]
+					},
+					{
+						"name": "ProcesarDatosApi",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "Copia_Datos_Api_Silver",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": {
+								"value": "@pipeline().parameters.ruta_notebook_databricks",
+								"type": "Expression"
+							},
+							"baseParameters": {
+								"departamento": {
+									"value": "@pipeline().parameters.departamento",
+									"type": "Expression"
+								},
+								"zona_storage": "silver",
+								"storage_key": {
+									"value": "@activity('ConsultarSecretoBlob').output.value",
+									"type": "Expression"
+								},
+								"key_cosmosdb": {
+									"value": "@activity('ConsultarSecretoBD').output.value",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_databricks_prueba",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ConsultarSecretoBlob",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "ConsultarSecretoBD",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": "https://kv-databricks-bpt.vault.azure.net/secrets/key-blob?api-version=7.0",
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
+						}
+					},
+					{
+						"name": "Copia_Datos_Api_Silver",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Copia_Datos_Api_Bronce",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_BlobStorage_DatosGov",
+								"type": "DatasetReference",
+								"parameters": {
+									"zona": "bronce",
+									"nombre_archivo": {
+										"value": "@pipeline().parameters.departamento",
+										"type": "Expression"
+									},
+									"contenedor": "contratos"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_Storage_Silver__DatosGov",
+								"type": "DatasetReference",
+								"parameters": {
+									"zona": "silver",
+									"nombre_archivo": {
+										"value": "@pipeline().parameters.departamento",
+										"type": "Expression"
+									},
+									"contenedor": "contratos"
+								}
+							}
+						]
+					},
+					{
+						"name": "ConsultarSecretoBD",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": "https://kv-databricks-bpt.vault.azure.net/secrets/key-cosmosdb?api-version=7.0",
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
 						}
 					}
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
+				"parameters": {
+					"departamento": {
+						"type": "string",
+						"defaultValue": "Antioquia"
+					},
+					"ruta_notebook_databricks": {
+						"type": "string",
+						"defaultValue": "/Users/yao.men92@hotmail.com/databricks-prueba-bpt/procesamiento_datos_silver_contratos"
+					}
+				},
 				"annotations": []
 			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_DatosGovColombia_CSV')]",
+				"[concat(variables('factoryId'), '/datasets/DS_BlobStorage_DatosGov')]",
+				"[concat(variables('factoryId'), '/linkedServices/ls_databricks_prueba')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Storage_Silver__DatosGov')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_BlobStorage_DatosGov')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Datalake",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"zona": {
+						"type": "string"
+					},
+					"nombre_archivo": {
+						"type": "string"
+					},
+					"contenedor": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@concat(dataset().nombre_archivo,'.csv')",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().contenedor",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().zona",
+							"type": "Expression"
+						}
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Datalake')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_DatosGovColombia_CSV')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "https://www.datos.gov.co",
+				"linkedServiceName": {
+					"referenceName": "LS_DatosAbiertos",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"p_departamento": {
+						"type": "string",
+						"defaultValue": "Meta"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": {
+							"value": "@concat(\n'resource/p6dx-8zbt.csv?$where=departamento_entidad=''',\ndataset().p_departamento,\n'''&$limit=5000&$offset=0'\n)",
+							"type": "Expression"
+						}
+					},
+					"columnDelimiter": ",",
+					"rowDelimiter": "\n",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_DatosAbiertos')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Storage_Silver__DatosGov')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_Datalake",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"zona": {
+						"type": "string"
+					},
+					"nombre_archivo": {
+						"type": "string"
+					},
+					"contenedor": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@concat(dataset().nombre_archivo,'.parquet')",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().contenedor",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().zona",
+							"type": "Expression"
+						}
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_Datalake')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_Datalake')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('LS_Datalake_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('LS_Datalake_accountKey')]"
+					}
+				}
+			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_DatosAbiertos')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('LS_DatosAbiertos_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_databricks_prueba')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-7405616487671258.18.azuredatabricks.net",
+					"accessToken": {
+						"type": "SecureString",
+						"value": "[parameters('ls_databricks_prueba_accessToken')]"
+					},
+					"existingClusterId": "[parameters('ls_databricks_prueba_properties_typeProperties_existingClusterId')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger_pipeline_contratos')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "pipeline_extraccion_datos_abiertos",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"departamento": "[parameters('trigger_pipeline_contratos_properties_pipeline_extraccion_datos_abiertos_parameters_departamento')]",
+							"ruta_notebook_databricks": "[parameters('trigger_pipeline_contratos_properties_pipeline_extraccion_datos_abiertos_parameters_ruta_notebook_databricks')]"
+						}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Month",
+						"interval": 1,
+						"startTime": "2026-02-15T13:50:00",
+						"timeZone": "SA Pacific Standard Time",
+						"schedule": {
+							"minutes": [
+								0
+							],
+							"hours": [
+								19
+							],
+							"monthDays": [
+								15
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pipeline_extraccion_datos_abiertos')]"
+			]
 		}
 	]
 }
