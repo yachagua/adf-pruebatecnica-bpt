@@ -6,10 +6,13 @@
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"ruta": {
+			"zona": {
 				"type": "string"
 			},
 			"nombre_archivo": {
+				"type": "string"
+			},
+			"contenedor": {
 				"type": "string"
 			}
 		},
@@ -22,8 +25,12 @@
 					"value": "@concat(dataset().nombre_archivo,'.csv')",
 					"type": "Expression"
 				},
+				"folderPath": {
+					"value": "@dataset().contenedor",
+					"type": "Expression"
+				},
 				"fileSystem": {
-					"value": "@dataset().ruta",
+					"value": "@dataset().zona",
 					"type": "Expression"
 				}
 			},
