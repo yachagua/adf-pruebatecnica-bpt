@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Copia_Datos_Api_Storage",
+				"name": "Copia_Datos_Api_Bronce",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -31,6 +31,10 @@
 									"value": "@addHours(utcNow(), -5)",
 									"type": "Expression"
 								}
+							},
+							{
+								"name": "origen_datos",
+								"value": "https://www.datos.gov.co"
 							}
 						],
 						"storeSettings": {
@@ -80,7 +84,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"ruta": {
-								"value": "@pipeline().parameters.zona_storage",
+								"value": "@pipeline().parameters.zona_bronce_storage",
 								"type": "Expression"
 							},
 							"nombre_archivo": {
@@ -96,7 +100,7 @@
 				"type": "DatabricksNotebook",
 				"dependsOn": [
 					{
-						"activity": "Copia_Datos_Api_Storage",
+						"activity": "Copia_Datos_Api_Silver",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -155,6 +159,95 @@
 						"resource": "https://vault.azure.net"
 					}
 				}
+			},
+			{
+				"name": "Copia_Datos_Api_Silver",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Copia_Datos_Api_Bronce",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"additionalColumns": [
+							{
+								"name": "fecha_carga",
+								"value": {
+									"value": "@addHours(utcNow(), -5)",
+									"type": "Expression"
+								}
+							},
+							{
+								"name": "origen_datos",
+								"value": {
+									"value": "@concat('storage/',pipeline().parameters.zona_bronce_storage)",
+									"type": "Expression"
+								}
+							}
+						],
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_BlobStorage_DatosGov",
+						"type": "DatasetReference",
+						"parameters": {
+							"ruta": {
+								"value": "@pipeline().parameters.zona_bronce_storage",
+								"type": "Expression"
+							},
+							"nombre_archivo": {
+								"value": "@pipeline().parameters.departamento",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_Storage_Silver__DatosGov",
+						"type": "DatasetReference"
+					}
+				]
 			}
 		],
 		"parameters": {
@@ -166,9 +259,13 @@
 				"type": "string",
 				"defaultValue": "/Users/yao.men92@hotmail.com/databricks-prueba-bpt/procesamiento_datos_silver_contratos"
 			},
-			"zona_storage": {
+			"zona_bronce_storage": {
 				"type": "string",
 				"defaultValue": "bronce"
+			},
+			"zona_silver_storage": {
+				"type": "string",
+				"defaultValue": "silver"
 			}
 		},
 		"annotations": []
