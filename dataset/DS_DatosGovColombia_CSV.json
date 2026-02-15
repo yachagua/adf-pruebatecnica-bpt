@@ -18,7 +18,7 @@
 			"location": {
 				"type": "HttpServerLocation",
 				"relativeUrl": {
-					"value": "@concat(\n'resource/p6dx-8zbt.csv?$where=departamento_entidad=''',\ndataset().p_departamento,\n'''&$limit=50000&$offset=0'\n)",
+					"value": "@concat(\n'resource/p6dx-8zbt.csv?$where=departamento_entidad=''',\ndataset().p_departamento,\n'''&$limit=5000&$offset=0'\n)",
 					"type": "Expression"
 				}
 			},
