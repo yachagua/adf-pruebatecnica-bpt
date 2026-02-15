@@ -225,7 +225,15 @@
 				"outputs": [
 					{
 						"referenceName": "DS_Storage_Silver__DatosGov",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"zona": "silver",
+							"nombre_archivo": {
+								"value": "@pipeline().parameters.departamento",
+								"type": "Expression"
+							},
+							"contenedor": "contratos"
+						}
 					}
 				]
 			}
