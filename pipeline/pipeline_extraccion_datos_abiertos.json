@@ -273,7 +273,7 @@
 		"parameters": {
 			"departamento": {
 				"type": "string",
-				"defaultValue": "Chocó"
+				"defaultValue": "Antioquia"
 			},
 			"ruta_notebook_databricks": {
 				"type": "string",
