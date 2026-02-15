@@ -1,0 +1,39 @@
+{
+	"name": "trigger_pipeline_contratos",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pipeline_extraccion_datos_abiertos",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"departamento": "Chocó",
+					"ruta_notebook_databricks": "/Users/yao.men92@hotmail.com/databricks-prueba-bpt/procesamiento_datos_silver_contratos"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Month",
+				"interval": 1,
+				"startTime": "2026-02-15T13:50:00",
+				"timeZone": "SA Pacific Standard Time",
+				"schedule": {
+					"minutes": [
+						0
+					],
+					"hours": [
+						19
+					],
+					"monthDays": [
+						15
+					]
+				}
+			}
+		}
+	}
+}

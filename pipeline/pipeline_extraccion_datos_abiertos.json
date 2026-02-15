@@ -1,0 +1,285 @@
+{
+	"name": "pipeline_extraccion_datos_abiertos",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copia_Datos_Api_Bronce",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "ConsultarSecretoBlob",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"additionalColumns": [
+							{
+								"name": "fecha_carga",
+								"value": {
+									"value": "@addHours(utcNow(), -5)",
+									"type": "Expression"
+								}
+							},
+							{
+								"name": "origen_datos",
+								"value": "https://www.datos.gov.co"
+							}
+						],
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_DatosGovColombia_CSV",
+						"type": "DatasetReference",
+						"parameters": {
+							"p_departamento": {
+								"value": "@pipeline().parameters.departamento",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_BlobStorage_DatosGov",
+						"type": "DatasetReference",
+						"parameters": {
+							"zona": {
+								"value": "bronce",
+								"type": "Expression"
+							},
+							"nombre_archivo": {
+								"value": "@pipeline().parameters.departamento",
+								"type": "Expression"
+							},
+							"contenedor": "contratos"
+						}
+					}
+				]
+			},
+			{
+				"name": "ProcesarDatosApi",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "Copia_Datos_Api_Silver",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": {
+						"value": "@pipeline().parameters.ruta_notebook_databricks",
+						"type": "Expression"
+					},
+					"baseParameters": {
+						"departamento": {
+							"value": "@pipeline().parameters.departamento",
+							"type": "Expression"
+						},
+						"zona_storage": "silver",
+						"storage_key": {
+							"value": "@activity('ConsultarSecretoBlob').output.value",
+							"type": "Expression"
+						},
+						"key_cosmosdb": {
+							"value": "@activity('ConsultarSecretoBD').output.value",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_databricks_prueba",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "ConsultarSecretoBlob",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "ConsultarSecretoBD",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": "https://kv-databricks-bpt.vault.azure.net/secrets/key-blob?api-version=7.0",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "Copia_Datos_Api_Silver",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Copia_Datos_Api_Bronce",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_BlobStorage_DatosGov",
+						"type": "DatasetReference",
+						"parameters": {
+							"zona": "bronce",
+							"nombre_archivo": {
+								"value": "@pipeline().parameters.departamento",
+								"type": "Expression"
+							},
+							"contenedor": "contratos"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_Storage_Silver__DatosGov",
+						"type": "DatasetReference",
+						"parameters": {
+							"zona": "silver",
+							"nombre_archivo": {
+								"value": "@pipeline().parameters.departamento",
+								"type": "Expression"
+							},
+							"contenedor": "contratos"
+						}
+					}
+				]
+			},
+			{
+				"name": "ConsultarSecretoBD",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": "https://kv-databricks-bpt.vault.azure.net/secrets/key-cosmosdb?api-version=7.0",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"departamento": {
+				"type": "string",
+				"defaultValue": "Antioquia"
+			},
+			"ruta_notebook_databricks": {
+				"type": "string",
+				"defaultValue": "/Users/yao.men92@hotmail.com/databricks-prueba-bpt/procesamiento_datos_silver_contratos"
+			}
+		},
+		"annotations": []
+	}
+}

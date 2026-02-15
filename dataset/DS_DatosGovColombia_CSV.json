@@ -1,0 +1,33 @@
+{
+	"name": "DS_DatosGovColombia_CSV",
+	"properties": {
+		"description": "https://www.datos.gov.co",
+		"linkedServiceName": {
+			"referenceName": "LS_DatosAbiertos",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"p_departamento": {
+				"type": "string",
+				"defaultValue": "Meta"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "@concat(\n'resource/p6dx-8zbt.csv?$where=departamento_entidad=''',\ndataset().p_departamento,\n'''&$limit=5000&$offset=0'\n)",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": ",",
+			"rowDelimiter": "\n",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
