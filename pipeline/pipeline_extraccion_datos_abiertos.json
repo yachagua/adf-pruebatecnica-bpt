@@ -7,7 +7,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "ConsultarSecreto",
+						"activity": "ConsultarSecretoBlob",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -127,7 +127,11 @@
 						},
 						"zona_storage": "silver",
 						"storage_key": {
-							"value": "@activity('ConsultarSecreto').output.value",
+							"value": "@activity('ConsultarSecretoBlob').output.value",
+							"type": "Expression"
+						},
+						"key_cosmosdb": {
+							"value": "@activity('ConsultarSecretoBD').output.value",
 							"type": "Expression"
 						}
 					}
@@ -138,9 +142,16 @@
 				}
 			},
 			{
-				"name": "ConsultarSecreto",
+				"name": "ConsultarSecretoBlob",
 				"type": "WebActivity",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "ConsultarSecretoBD",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -236,6 +247,27 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "ConsultarSecretoBD",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": "https://kv-databricks-bpt.vault.azure.net/secrets/key-cosmosdb?api-version=7.0",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
 			}
 		],
 		"parameters": {
