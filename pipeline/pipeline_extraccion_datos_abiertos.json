@@ -277,7 +277,7 @@
 			},
 			"ruta_notebook_databricks": {
 				"type": "string",
-				"defaultValue": "/Users/yao.men92@hotmail.com/databricks-prueba-bpt/procesamiento_datos_silver_contratos"
+				"defaultValue": "/Workspace/Users/yao.men92@hotmail.com/databricks-prueba-bpt/procesamiento_datos_silver_contratos"
 			}
 		},
 		"annotations": []
